@@ -1,0 +1,57 @@
+<?php
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DepotController as D;
+use App\Http\Middleware\{ActiveAccount,AdminOnly};
+Route::get('/',fn()=>redirect()->route('dashboard'));
+Route::middleware('guest')->group(function(){
+    Route::get('/login',[D::class,'loginForm'])->name('login');
+    Route::post('/login',[D::class,'login'])->middleware('throttle:5,1');
+    Route::get('/seller/login',[D::class,'loginForm'])->name('seller.login');
+    Route::post('/seller/login',[D::class,'login'])->middleware('throttle:5,1')->name('seller.login.submit');
+    Route::get('/manager/login',[D::class,'loginForm'])->name('manager.login');
+    Route::post('/manager/login',[D::class,'login'])->middleware('throttle:5,1')->name('manager.login.submit');
+    Route::get('/register',[D::class,'registerForm'])->name('register');
+    Route::post('/register',[D::class,'register'])->middleware('throttle:5,1');
+});
+Route::middleware(['auth',ActiveAccount::class])->group(function(){
+    Route::post('/logout',[D::class,'logout'])->name('logout');
+    Route::get('/manager/accounts/create',[\App\Http\Controllers\ManagerAccountController::class,'create'])->name('manager.accounts.create');
+    Route::post('/manager/accounts',[\App\Http\Controllers\ManagerAccountController::class,'save'])->name('manager.accounts.store');
+    Route::get('/manager/accounts/{account}/edit',[\App\Http\Controllers\ManagerAccountController::class,'edit'])->name('manager.accounts.edit');
+    Route::put('/manager/accounts/{account}',[\App\Http\Controllers\ManagerAccountController::class,'save'])->name('manager.accounts.update');
+    Route::delete('/manager/accounts/{account}',[\App\Http\Controllers\ManagerAccountController::class,'destroy'])->name('manager.accounts.destroy');
+    Route::get('/manager/accounts',[D::class,'accountDirectory'])->name('manager.accounts');
+    Route::get('/dashboard',[D::class,'dashboard'])->name('dashboard');
+    Route::get('/pos',[D::class,'pos'])->name('pos');
+    Route::post('/checkout',[D::class,'checkout'])->name('checkout');
+    Route::get('/garage',[D::class,'garage'])->name('garage');
+    Route::get('/profile',[D::class,'profile'])->name('profile');
+    Route::put('/profile',[D::class,'profileSave'])->name('profile.update');
+    Route::get('/tanks',[D::class,'tanks'])->name('tanks.index');
+    Route::middleware(AdminOnly::class)->group(function(){
+        Route::get('/tanks/create',[D::class,'tankForm'])->name('tanks.create');
+        Route::post('/tanks',[D::class,'tankSave'])->name('tanks.store');
+        Route::get('/tanks/{tank}/edit',[D::class,'tankForm'])->name('tanks.edit');
+        Route::put('/tanks/{tank}',[D::class,'tankSave'])->name('tanks.update');
+        Route::post('/tanks/{tank}/stock',[D::class,'stock'])->name('tanks.stock');
+        Route::get('/customers',[D::class,'customers'])->name('customers.index');
+        Route::get('/customers/create',[D::class,'customerForm'])->name('customers.create');
+        Route::post('/customers',[D::class,'customerSave'])->name('customers.store');
+        Route::get('/customers/{customer}/edit',[D::class,'customerForm'])->name('customers.edit');
+        Route::put('/customers/{customer}',[D::class,'customerSave'])->name('customers.update');
+        Route::get('/members',[D::class,'members'])->name('members.index');
+        Route::get('/members/create',[D::class,'memberForm'])->name('members.create');
+        Route::post('/members',[D::class,'memberSave'])->name('members.store');
+        Route::get('/members/{member}',[D::class,'member'])->name('members.show');
+        Route::get('/members/{member}/edit',[D::class,'memberForm'])->name('members.edit');
+        Route::put('/members/{member}',[D::class,'memberSave'])->name('members.update');
+        Route::post('/members/{member}/topup',[D::class,'topup'])->name('members.topup');
+        Route::get('/reports',[D::class,'reports'])->name('reports');
+        Route::get('/reports/export',[D::class,'export'])->name('reports.export');
+    });
+    Route::get('/tanks/{tank}',[D::class,'tank'])->name('tanks.show');
+    Route::get('/sales',[D::class,'sales'])->name('sales.index');
+    Route::get('/sales/{sale}',[D::class,'receipt'])->name('sales.show');
+    Route::get('/credits',[D::class,'credits'])->name('credits');
+    Route::get('/guide',[D::class,'guide'])->name('guide');
+});

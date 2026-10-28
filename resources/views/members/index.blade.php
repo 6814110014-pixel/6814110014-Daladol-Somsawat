@@ -1,0 +1,7 @@
+@extends('layouts.app')
+@section('title','สมาชิก & โรงรถ')
+@section('content')
+<div class="page-heading"><div><span class="eyebrow olive">PLAYER REGISTRY</span><h1>สมาชิก & โรงรถ</h1><p>จัดการผู้เล่น เครดิต และคอลเลกชันรถถังที่ซื้อแล้ว</p></div><a href="{{ route('members.create') }}" class="btn primary">+ เพิ่มสมาชิก</a></div>
+<form class="filters" method="get"><input class="search-input" name="q" value="{{ request('q') }}" placeholder="ค้นหาชื่อ รหัสผู้เล่น หรือเบอร์โทร" aria-label="ค้นหาสมาชิก"><button class="btn secondary">ค้นหา</button><a class="text-link" href="{{ route('members.index') }}">ล้าง</a></form>
+<section class="panel"><div class="table-wrap"><table><thead><tr><th>ผู้เล่น</th><th>ติดต่อ</th><th>เครดิตคงเหลือ</th><th>สถานะ</th><th></th></tr></thead><tbody>@forelse($members as $member)<tr><td><strong>{{ $member->name }}</strong><small class="mono">{{ $member->player_code }}</small></td><td>{{ $member->email ?: '—' }}<small>{{ $member->phone ?: '—' }}</small></td><td class="number">{{ number_format($member->credits) }} CR</td><td><span class="badge {{ $member->active?'good':'' }}">{{ $member->active?'ใช้งาน':'ปิดใช้งาน' }}</span></td><td><a class="text-link" href="{{ route('members.show',$member) }}">เปิดโรงรถ →</a></td></tr>@empty<tr><td colspan="5"><div class="empty"><h3>ไม่พบสมาชิก</h3><p>เพิ่มสมาชิกใหม่ หรือเปลี่ยนคำค้นหา</p></div></td></tr>@endforelse</tbody></table></div>{{ $members->links('pagination') }}</section>
+@endsection
